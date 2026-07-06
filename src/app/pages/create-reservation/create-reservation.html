@@ -1,0 +1,109 @@
+<section class="booking-page">
+  <div class="booking-heading">
+    <p class="eyebrow">Hotel Zoka</p>
+    <h1>Reserva tu habitacion</h1>
+    <p>Elige una habitacion, marca tus fechas y deja tus datos. Te mostraremos el seguimiento de tu solicitud al terminar.</p>
+  </div>
+
+  <div class="reservation-layout">
+    <mat-card class="reservation-card">
+      <mat-card-header class="card-heading">
+        <mat-card-title>Tu estadia</mat-card-title>
+        <mat-card-subtitle>Completa los datos para enviar la solicitud.</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="section-title">Habitacion</div>
+          <mat-form-field appearance="outline">
+            <mat-label>Selecciona una opcion</mat-label>
+            <mat-select formControlName="roomId" [disabled]="loadingRooms()">
+              @if (loadingRooms()) {
+                <mat-option disabled>Cargando habitaciones...</mat-option>
+              } @else {
+                @for (room of rooms(); track room.id) {
+                  <mat-option [value]="room.id">
+                    {{ room.type }} · Habitacion {{ room.roomNumber }}
+                  </mat-option>
+                }
+              }
+            </mat-select>
+            @if (form.controls.roomId.hasError('required')) {
+              <mat-error>Selecciona una habitacion</mat-error>
+            }
+          </mat-form-field>
+          @if (!loadingRooms() && rooms().length === 0) {
+            <p class="inline-note">Por ahora no hay habitaciones disponibles para reservar.</p>
+          }
+
+          <div class="section-title">Datos personales</div>
+          <div class="field-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput formControlName="guestName" placeholder="Ana Perez" />
+              @if (form.controls.guestName.hasError('required')) {
+                <mat-error>El nombre es requerido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Correo electronico</mat-label>
+              <input matInput type="email" formControlName="guestEmail" placeholder="ana@test.com" />
+              @if (form.controls.guestEmail.hasError('email')) {
+                <mat-error>Ingresa un email valido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="section-title">Fechas</div>
+          <mat-form-field appearance="outline" class="range-field">
+            <mat-label>Llegada y salida</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [min]="minDate">
+              <input matStartDate formControlName="checkInDate" placeholder="Check-in" />
+              <input matEndDate formControlName="checkOutDate" placeholder="Check-out" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+            @if (form.controls.checkInDate.hasError('required') || form.controls.checkOutDate.hasError('required')) {
+              <mat-error>Selecciona ambas fechas</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="actions">
+            <button mat-flat-button type="submit" [disabled]="loading()">
+              {{ loading() ? 'Enviando...' : 'Solicitar reserva' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <aside class="summary-panel">
+      @if (createdReservation(); as reservation) {
+        <span class="reservation-status">{{ statusLabel(reservation.status) }}</span>
+        <h2>Solicitud enviada</h2>
+        <p class="summary-copy">Guarda este codigo para consultar tu reserva cuando quieras.</p>
+        <div class="reservation-code">{{ reservationCode(reservation) }}</div>
+        <dl>
+          <dt>Huesped</dt>
+          <dd>{{ reservation.guestName }}</dd>
+          <dt>Fechas</dt>
+          <dd>{{ reservation.checkInDate }} al {{ reservation.checkOutDate }}</dd>
+        </dl>
+        <a mat-stroked-button [routerLink]="['/reservations', reservationCode(reservation)]">Ver estado</a>
+      } @else {
+        <span class="panel-kicker">Resumen</span>
+        <h2>Tu seleccion</h2>
+        <dl>
+          <dt>Habitacion</dt>
+          <dd>{{ selectedRoomLabel() }}</dd>
+          <dt>Huesped</dt>
+          <dd>{{ guestLabel() }}</dd>
+          <dt>Fechas</dt>
+          <dd>{{ dateRangeLabel() }}</dd>
+        </dl>
+        <p class="summary-copy">La reserva queda sujeta a disponibilidad. Al enviarla podras revisar su estado.</p>
+      }
+    </aside>
+  </div>
+</section>

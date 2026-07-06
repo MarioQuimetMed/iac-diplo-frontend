@@ -1,0 +1,57 @@
+.topbar {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(39, 31, 42, 0.1);
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+  min-height: 72px;
+  padding-inline: clamp(18px, 5vw, 72px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  font-weight: 700;
+  gap: 10px;
+  letter-spacing: 0;
+}
+
+.brand-logo {
+  display: block;
+  height: 46px;
+  object-fit: contain;
+  width: auto;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.active-link {
+  background: rgba(76, 35, 79, 0.12);
+  color: #2f1736;
+}
+
+.app-shell {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: clamp(26px, 5vw, 56px) clamp(18px, 5vw, 72px) 64px;
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    min-height: 64px;
+    padding-block: 10px;
+  }
+
+  .brand-logo {
+    height: 38px;
+  }
+}

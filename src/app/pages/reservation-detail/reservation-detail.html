@@ -1,0 +1,78 @@
+<section class="status-page">
+  <div class="status-heading">
+    <p class="eyebrow">Hotel Zoka</p>
+    <h1>Consulta tu estadia</h1>
+    <p>Usa tu codigo de reserva para revisar el estado de tu solicitud.</p>
+  </div>
+
+  <div class="page-grid">
+  <mat-card class="search-card">
+    <mat-card-header>
+      <mat-card-title>Buscar reserva</mat-card-title>
+      <mat-card-subtitle>El codigo aparece al finalizar la solicitud.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form class="form" [formGroup]="form" (ngSubmit)="search()">
+        <mat-form-field appearance="outline">
+          <mat-label>Codigo de reserva</mat-label>
+          <input matInput formControlName="id" placeholder="Ej. 6AE92A4D" />
+          @if (form.controls.id.hasError('required')) {
+            <mat-error>El codigo es requerido</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="loading()">
+          {{ loading() ? 'Buscando...' : 'Buscar reserva' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="result-card">
+    <mat-card-content>
+      @if (loading()) {
+        <div class="loading">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Buscando tu reserva...</span>
+        </div>
+      } @else if (reservation(); as item) {
+        <div class="result-top">
+          <mat-chip-set>
+          <mat-chip [class]="statusClass(item.status)">
+            {{ statusLabel(item.status) }}
+          </mat-chip>
+        </mat-chip-set>
+          <span class="code-pill">{{ reservationCode(item) }}</span>
+        </div>
+
+        <h2>{{ statusTitle(item.status) }}</h2>
+        <p class="status-copy">{{ statusDescription(item.status) }}</p>
+
+        <dl class="detail-list">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{{ item.guestName }}</dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd>{{ item.guestEmail }}</dd>
+          </div>
+          <div>
+            <dt>Estadia</dt>
+            <dd>{{ reservationDates(item) }}</dd>
+          </div>
+        </dl>
+
+        <button mat-stroked-button type="button" (click)="refresh()">Actualizar estado</button>
+      } @else {
+        <div class="empty-state">
+          <span class="panel-kicker">Estado de reserva</span>
+          <h2>Todo listo para consultar</h2>
+          <p>Ingresa tu codigo y aqui veras la informacion de tu estadia.</p>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+  </div>
+</section>
