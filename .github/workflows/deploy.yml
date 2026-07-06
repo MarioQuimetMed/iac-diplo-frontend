@@ -11,7 +11,7 @@ env:
   DIST_FOLDER: dist/iac-diplo-frontend/browser
   AWS_REGION: us-east-1
   # El nombre exacto que calculó Terraform para tu bucket
-  S3_BUCKET: test-nest-frontend-286273776844 
+  S3_BUCKET: test-nest-frontend-286273776844
 
 jobs:
   build-and-deploy:
