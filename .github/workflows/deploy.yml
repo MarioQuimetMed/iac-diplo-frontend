@@ -1,1 +1,52 @@
+name: Deploy Angular to S3
 
+on:
+  push:
+    branches:
+      - main # O la rama principal de tu repositorio
+
+env:
+  # La carpeta generada por Angular (usando @angular/build:application).
+  # Los archivos estáticos se generan dentro de la subcarpeta 'browser'.
+  DIST_FOLDER: dist/iac-diplo-frontend/browser
+  AWS_REGION: us-east-1
+  # El nombre exacto que calculó Terraform para tu bucket
+  S3_BUCKET: test-nest-frontend-286273776844 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Ajusta a la versión de pnpm que uses localmente
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24' # O la versión que utilices
+          cache: 'pnpm'
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile # o pnpm install si no tienes pnpm-lock.yaml
+
+      - name: Compilar Angular para Producción
+        run: pnpm run build --configuration production
+
+      - name: Configurar Credenciales de AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Desplegar a S3
+        # Subimos el contenido de la carpeta compilada al bucket
+        # El flag --delete borra los archivos viejos en S3 que ya no existan en el nuevo build
+        run: |
+          aws s3 sync ./${{ env.DIST_FOLDER }} s3://${{ env.S3_BUCKET }} --delete
